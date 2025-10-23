@@ -13,6 +13,66 @@ local Window = Fluent:CreateWindow({
     Acrylic = false,
     Theme = "Darker",
     MinimizeKey = Enum.KeyCode.LeftControl
+local toggleButton = Instance.new("ImageButton")
+toggleButton.Size = UDim2.new(0, 50, 0, 50)
+toggleButton.Position = UDim2.new(0.15, 0, 0.15, 0)
+toggleButton.Image = "rbxassetid://76595458631173" -- sua imagem
+toggleButton.ScaleType = Enum.ScaleType.Fit
+toggleButton.BackgroundColor3 = Color3.fromRGB(0, 102, 255) -- cor de fundo (caso a imagem tenha transparência)
+toggleButton.Parent = screenGui
+
+-- 🔵 Deixa o botão totalmente redondo
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(1, 0) -- 1 = totalmente redondo
+corner.Parent = toggleButton
+
+-- Lógica de arrastar
+local isFluentVisible = true
+local dragging, dragInput, dragStart, startPos
+
+local function update(input)
+    local AndepZai = input.Position - dragStart
+    toggleButton.Position = UDim2.new(
+        startPos.X.Scale,
+        startPos.X.Offset + AndepZai.X,
+        startPos.Y.Scale,
+        startPos.Y.Offset + AndepZai.Y
+    )
+end
+
+toggleButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = toggleButton.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+toggleButton.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if dragging and input == dragInput then
+        update(input)
+    end
+end)
+
+	toggleButton.MouseButton1Click:Connect(function()
+		isFluentVisible = not isFluentVisible
+		if isFluentVisible then
+			Window:Minimize(false)
+		else
+			Window:Minimize(true)
+		end
+	end)
 })
 
 local Tabs = {
